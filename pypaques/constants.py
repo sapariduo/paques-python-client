@@ -1,4 +1,4 @@
-DEFAULT_PORT = 8080
+DEFAULT_PORT = 8111
 DEFAULT_SOURCE = 'paques-python-client'
 DEFAULT_AUTH = None  # type: Optional[Any]
 DEFAULT_MAX_ATTEMPTS = 3
