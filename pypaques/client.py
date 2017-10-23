@@ -2,7 +2,7 @@ import requests
 import ujson
 import sseclient
 import pprint
-import pandas
+import pandas as pd
 
 from pypaques import constants
 from pypaques import exceptions
@@ -292,7 +292,7 @@ class PaquesResult(object):
     @property
     def tables(self):
         # type: Dict
-        return self._tables
+        return self._tables.keys()
     
     @property
     def dataframe(self):
@@ -321,10 +321,12 @@ class PaquesResult(object):
                 except:
                     continue
             
-            self._dataframe = {table: pd.DataFrame.from_records(self._tables[table]['rows'], columns=self._tables[table]['columns']) for table in self.tables}    
         
         except:
             pass
+        
+        self._dataframe = {table: pd.DataFrame.from_records(self._tables[table]['rows'], columns=self._tables[table]['columns']) for table in self.tables}    
+
 
 class PaquesQuery(object):
     """Represent the execution of a PQL statement by Paques."""
@@ -373,7 +375,7 @@ class PaquesQuery(object):
         self._stats = {u'queryId': self.query_id}
         return status
     
-    def execute(self):
+    def execute(self, node, id):
         # type: () -> PaquesResult
         """
         HTTP reques sent to master coordinator, It set query id and 
@@ -384,7 +386,7 @@ class PaquesQuery(object):
         if self._cancelled:
             raise exceptions.PaquesUserError("Query has been cancelled")
          
-        params = {u'event': 'stream', u'quid': self.query_id}
+        params = {u'event': 'stream', u'quid': id}
         response = self._request.get(self.node_url, params)
         _response = sseclient.SSEClient(response)
         for event in _response.events():
